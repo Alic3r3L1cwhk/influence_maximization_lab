@@ -136,7 +136,13 @@ class ParameterLearner:
             all_labels.extend(labels.cpu().numpy())
 
         avg_loss = total_loss / len(dataloader)
-        auc = roc_auc_score(all_labels, all_preds)
+        # Metrics expect binary labels; training labels can be fractional (activation rate per edge)
+        binary_labels = (np.array(all_labels) > 0).astype(int)
+        if binary_labels.max() == binary_labels.min():
+            warnings.warn("AUC is undefined when only one class is present; returning NaN.")
+            auc = float('nan')
+        else:
+            auc = roc_auc_score(binary_labels, all_preds)
 
         return avg_loss, auc
 
@@ -168,11 +174,17 @@ class ParameterLearner:
                 all_labels.extend(labels.cpu().numpy())
 
         avg_loss = total_loss / len(dataloader)
-        auc = roc_auc_score(all_labels, all_preds)
+        binary_labels = (np.array(all_labels) > 0).astype(int)
+
+        if binary_labels.max() == binary_labels.min():
+            warnings.warn("AUC is undefined when only one class is present; returning NaN.")
+            auc = float('nan')
+        else:
+            auc = roc_auc_score(binary_labels, all_preds)
 
         # Binary accuracy with 0.5 threshold
         binary_preds = (np.array(all_preds) > 0.5).astype(int)
-        accuracy = accuracy_score(all_labels, binary_preds)
+        accuracy = accuracy_score(binary_labels, binary_preds)
 
         return avg_loss, auc, accuracy
 

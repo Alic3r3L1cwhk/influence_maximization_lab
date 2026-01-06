@@ -7,6 +7,7 @@ import argparse
 import os
 import sys
 import numpy as np
+import warnings
 import networkx as nx
 
 # Add src to path
@@ -204,8 +205,15 @@ def main():
     test_predictions = learner.predict(test_features)
 
     from sklearn.metrics import roc_auc_score, accuracy_score
-    test_auc = roc_auc_score(test_labels, test_predictions)
-    test_acc = accuracy_score(test_labels, (test_predictions > 0.5).astype(int))
+    binary_test_labels = (np.array(test_labels) > 0).astype(int)
+
+    if binary_test_labels.max() == binary_test_labels.min():
+        warnings.warn("Test set has only one class; AUC is undefined. Returning NaN.")
+        test_auc = float('nan')
+    else:
+        test_auc = roc_auc_score(binary_test_labels, test_predictions)
+
+    test_acc = accuracy_score(binary_test_labels, (test_predictions > 0.5).astype(int))
 
     print(f"Test AUC: {test_auc:.4f}")
     print(f"Test Accuracy: {test_acc:.4f}")

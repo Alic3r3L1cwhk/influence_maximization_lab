@@ -1,0 +1,68 @@
+# Example Configuration for Influence Maximization Experiments
+
+# Network Configuration
+network:
+  type: "ba"  # Options: er, ba, ws
+  num_nodes: 500
+  ba_m: 3  # For BA model
+  er_p: 0.01  # For ER model
+  ws_k: 4  # For WS model
+  ws_p: 0.1  # For WS model
+
+# Diffusion Model
+diffusion:
+  model: "ic"  # Options: ic, lt
+  prob_range: [0.01, 0.1]  # For IC model
+  threshold_range: [0.1, 0.9]  # For LT model
+
+# Cascade Generation
+cascades:
+  num_cascades: 1000
+  initial_size_range: [1, 5]
+
+# Graph Embedding
+embedding:
+  method: "node2vec"  # Options: node2vec, deepwalk
+  dim: 128
+  num_walks: 10
+  walk_length: 80
+  node2vec_p: 1.0
+  node2vec_q: 1.0
+  window_size: 10
+  epochs: 5
+
+# Parameter Learning
+learning:
+  hidden_dims: [256, 128, 64]
+  dropout: 0.3
+  learning_rate: 0.001
+  epochs: 100
+  batch_size: 256
+  early_stopping_patience: 10
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+# Influence Maximization
+influence_max:
+  algorithm: "lazy_greedy"  # Options: greedy, lazy_greedy, tim, tim_plus
+  k: 10
+  num_simulations: 1000
+  tim_epsilon: 0.2
+  parallel: false
+  num_workers: 4
+
+# Experiment Settings
+experiment:
+  num_runs: 5
+  compare_params: true
+  k_values: [10, 20, 30]
+  algorithms: ["lazy_greedy", "tim", "tim_plus"]
+
+# General Settings
+general:
+  seed: 42
+  device: "cuda"  # Options: cuda, cpu
+  output_dir: "outputs/experiments"
+  save_graph: true
+  verbose: true
